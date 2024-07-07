@@ -2,34 +2,40 @@
 import time
 
 # Global Variables
-ac_balance = 10000
-ac_pin = 1234
-accepted_cards_list = ["Card", "card", "CARD"]
+AC_BALANCE = 10000
+AC_PIN = 1234
+ACCEPTED_CARDS_LIST = ["Card", "card", "CARD"]
 
 # Creating necessary functions
 def greet():
     name = input("Enter your name: ")
-    if type(name) == str:
+    if isinstance(name, str):
         print(f"Hello {name}!")
         time.sleep(1)
         print("Welcome to Python ATM")
         time.sleep(1)
     else: 
         print("Invalid Response, try again")
-
+        
 def user_verification():
+    greet()
     while True:
-        greet()
-        accepted_cards(card=input("Please insert your card: "))
-        time.sleep(1)
-        pin_check(pin=int(input("Enter your pin: ")))
-        time.sleep(1)
-        main()
-        break
-
+        if accepted_cards(input("Please insert your card: ")):
+            break
+        else:
+            time.sleep(1)
+    
+    while True:
+        if pin_check(int(input("Enter your pin: "))):
+            time.sleep(1)
+            main()
+            break
+        else:
+            time.sleep(1)
+            
 def accepted_cards(card):
-    global accepted_cards_list
-    if card in accepted_cards_list:
+    global ACCEPTED_CARDS_LIST
+    if card in ACCEPTED_CARDS_LIST:
         print("Card accepted")
         return True
     else:
@@ -38,8 +44,8 @@ def accepted_cards(card):
         return False
 
 def pin_check(pin):
-    global ac_pin
-    if pin == ac_pin:
+    global AC_PIN
+    if pin == AC_PIN:
         print("Correct Pin")
         return True
     else:
@@ -47,47 +53,48 @@ def pin_check(pin):
         return False
 
 def cash_withdraw():
-    global ac_balance
-    amount = int(input("Enter Withdrawal Amount: "))
-    if amount <= ac_balance:
-        time.sleep(1)
-        print("Withrawing...")
-        time.sleep(2)
-        ac_balance -= amount
-        print(f"Your new balance: {ac_balance}")
-        time.sleep(1)
-        main_screen_option = input("Would you like to make another transaction? (Y/N): ")
-        if main_screen_option.lower() == "y":
-            main()
+    global AC_BALANCE
+    try:
+        amount = int(input("Enter Withdrawal Amount: "))
+        if amount <= AC_BALANCE:
+            time.sleep(1)
+            print("Withrawing...")
+            time.sleep(2)
+            AC_BALANCE -= amount
+            print(f"Your new balance: {AC_BALANCE}")
+            time.sleep(1)
+            if not another_transaction():
+                exit_program()
         else:
-            exit_program()
-    else:
-        print("Insufficient Balance")
-
+            print("Insufficient Balance")
+    except ValueError:
+        print("Invalid Input. please enter a valid amount to continue")
+            
 def cash_deposit():
-    global ac_balance
-    amount = int(input("Enter Deposit Amount: "))
-    time.sleep(1)
-    print("Depositing...")
-    time.sleep(2)
-    ac_balance += amount
-    print(f"Your new balance is: {ac_balance}")
-    time.sleep(1)
-    main_screen_option = input("Would you like to make another transaction? (Y/N): ")
-    if main_screen_option.lower() == "y":
-        main()
-    else:
-        exit_program()
+    global AC_BALANCE
+    try:
+        amount = int(input("Enter Deposit Amount: "))
+        time.sleep(1)
+        print("Depositing...")
+        time.sleep(2)
+        AC_BALANCE += amount
+        print(f"Your new balance is: {AC_BALANCE}")
+        time.sleep(1)
+        if not another_transaction():
+            exit_program()
+    except ValueError:
+        print("Invalid Input. please enter a valid amount to continue")
    
 def check_balance():
     print("Checking...")
-    print(f"Your balance is: {ac_balance}")
+    print(f"Your balance is: {AC_BALANCE}")
     time.sleep(1)
-    main_screen_option = input("Would you like to make another transaction? (Y/N): ")
-    if main_screen_option.lower() == "y":
-        main()
-    else:
+    if not another_transaction():
         exit_program()
+
+def another_transaction():
+    main_screen_option = input("Would you like to make another transaction? (Y/N): ").lower()
+    return main_screen_option == "y"
     
 def main():
     while True:
@@ -111,7 +118,6 @@ def main():
             time.sleep(1)
             exit_program()
 
-            
             break
 
         else:
@@ -125,5 +131,5 @@ def exit_program():
     time.sleep(1)
     exit()
 
-# Calling Functions
+# Start the ATM program
 user_verification()
